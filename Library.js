@@ -1,5 +1,16 @@
 let myLibrary = [];
 
+const bookForm = document.querySelector("#add-book-card");
+const showFormBtn = document.querySelector("#show-form-btn");
+
+showFormBtn.addEventListener("click", toggleFormDisplay);
+
+addEventListener("click", (e) => {
+    if(bookForm.classList.contains("active") && !bookForm.contains(e.target)){
+        bookForm.classList.remove("active");
+    }   
+});
+
 addEventListener("submit", addBookToLibrary);
 
 function Book(title, author, pages, isRead) {
@@ -19,7 +30,17 @@ function addBookToLibrary(e) {
     newBook.isRead = document.querySelector("#read").checked;
 
     myLibrary.push(newBook);
+
+    document.querySelector("#add-book-form").reset();
+    toggleFormDisplay(e);
     displayBooks();
+}
+
+function toggleFormDisplay(e) {
+    e.stopPropagation();
+
+    bookForm.classList.contains("active") ? 
+        bookForm.classList.remove("active") : bookForm.classList.add("active");
 }
 
 function displayBooks() {
@@ -30,17 +51,33 @@ function displayBooks() {
         card.className = "book-card";
         card.dataset.attribute = i;
 
-        const title = document.createElement("p");
+        const title = document.createElement("div");
         title.innerText = book.title;
 
-        const author = document.createElement("p");
+        const author = document.createElement("div");
         author.innerText = book.author;
         
-        const pages = document.createElement("p");
+        const pages = document.createElement("div");
         pages.innerText = book.pages;
 
-        const read = document.createElement("p");
-        read.innerText = book.isRead ? "Read" : "Not Read";
+        // const read = document.createElement("div");
+        // read.innerText = book.isRead ? "Read" : "Not Read";
+
+        const changeReadStatusBtn = document.createElement("button");
+        
+        if(book.isRead) {
+            changeReadStatusBtn.textContent = "Read";
+            changeReadStatusBtn.className = "read";
+        }else {
+            changeReadStatusBtn.textContent = "Not Read";
+            changeReadStatusBtn.className = "not-read";
+        }
+
+        changeReadStatusBtn.addEventListener("click", () => {
+            book.isRead = !book.isRead;
+            clearBooks();
+            displayBooks();
+        });        
 
         const removeBookBtn = document.createElement("button");
         removeBookBtn.textContent = "Remove";
@@ -48,21 +85,13 @@ function displayBooks() {
             removeBook(i);
             displayBooks();
         });
-
-        const changeReadStatusBtn = document.createElement("button");
-        changeReadStatusBtn.textContent = "Change Read Status";
-        changeReadStatusBtn.addEventListener("click", () => {
-            book.isRead = !book.isRead;
-            clearBooks();
-            displayBooks();
-        });        
+        
         
         card.appendChild(title);
         card.appendChild(author);
         card.appendChild(pages);
-        card.appendChild(read);
-        card.appendChild(removeBookBtn);
         card.appendChild(changeReadStatusBtn);
+        card.appendChild(removeBookBtn);
         document.querySelector("#main").appendChild(card);
     })
 }
